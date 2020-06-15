@@ -1,21 +1,43 @@
-import React from "react";
-import data from "./dataExample.json";
+import React, { useState, useEffect } from "react";
+import axios from "axios"
 import "../example.css";
-export default function Togo() {
+
+export default function Myexample() {
+  const [data, setData] = useState({ hits: [] });
+  const [query, setQuery] = useState(1);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchData() {
+      const result = await axios("https://collectionapi.metmuseum.org/public/collection/v1/objects/" + query);
+
+      if (!ignore) setData(result.data);
+    }
+
+    fetchData();
+
+    return () => { ignore = true; }
+  }, [query]);
+
   function Printdata() {
+    
     if (data.additionalImages === undefined)
       data.additionalImages = ["../../image/téléchargement.jpeg"]
-
+    if(data.primaryImageSmall===undefined)
+    data.primaryImageSmall= "../../image/téléchargement.jpeg"
     return (
       <div>
         <div className="title">
           <h1> {data.title} </h1>
         </div>
-      {data.artistDisplayName!=="" &&
+
+        {data.artistDisplayName!=="" &&
         <div className="artistDisplayName">
           <h2>{data.artistDisplayName}</h2>
         </div>
         }
+
         <div className="repository">
           <h3>{data.repository}</h3>
         </div >
@@ -73,9 +95,12 @@ export default function Togo() {
       </div>
     );
   };
+
   return (
     <div>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
       <Printdata />
+
     </div>
   );
 }

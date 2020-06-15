@@ -1,7 +1,26 @@
-import React from "react";
-import data from "./dataExample.json";
+import React, { useState, useEffect } from "react";
+import axios from "axios"
 import "../example.css";
-export default function Togo() {
+
+export default function Myexample() {
+  const [data, setData] = useState({ hits: [] });
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchData() {
+      const result = await axios("https://collectionapi.metmuseum.org/public/collection/v1/objects/4534");
+
+      if (!ignore) setData(result.data);
+      console.log(data)
+    }
+
+    fetchData();
+
+    return () => { ignore = true; }
+  }, [data]);
+
+
   function Printdata() {
     if (data.additionalImages === undefined)
       data.additionalImages = ["../../image/téléchargement.jpeg"]
@@ -11,11 +30,13 @@ export default function Togo() {
         <div className="title">
           <h1> {data.title} </h1>
         </div>
-      {data.artistDisplayName!=="" &&
+
+        {data.artistDisplayName!=="" &&
         <div className="artistDisplayName">
           <h2>{data.artistDisplayName}</h2>
         </div>
         }
+
         <div className="repository">
           <h3>{data.repository}</h3>
         </div >
@@ -73,6 +94,8 @@ export default function Togo() {
       </div>
     );
   };
+
+
   return (
     <div>
       <Printdata />
